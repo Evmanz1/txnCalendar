@@ -5,6 +5,7 @@ import { Calendar } from '@nivo/calendar';
 import { parseEtherscanData } from './data.js';
 
 
+
 //const calendarLightTheme = {}; //for later
 const calendarDarkTheme = {
     "background": "#22272e",
@@ -18,8 +19,8 @@ const calendarDarkTheme = {
     }
 };
 
-var transactionData = []
 
+var transactionData = []
 
 const testData =  [
 {
@@ -59,7 +60,7 @@ const testData =  [
 
 
 const margin = {
-top: 40,
+top: 100,
 right: 10,
 bottom: 10,
 left: 60
@@ -74,17 +75,27 @@ const TopBar = ({updateData}) => {
 
 
     const handleKeyDown = async (event) => {
-
-        // check if keypress was Enter + check for a valid address (add checksummed version later?)
-        if (event.code === "Enter" && (/^(0x)?[0-9a-f]{40}$/i.test(inputRef.current.value))) {
-            console.log(inputRef.current.value);
-            transactionData = await parseEtherscanData(inputRef.current.value);
-            console.log(transactionData);
-            
-            updateData(transactionData);
-
+        const value = inputRef.current.value;
+        // check if keypress was Enter
+        if (event.code === "Enter") {
+            if (/^(0x)?[0-9a-f]{40}$/i.test(value)){ // check for valid address
+                transactionData = await parseEtherscanData(value);
+                //console.log(transactionData);
+                
+                updateData(transactionData);
+            } /*else { // check for ENS
+                if (value.length > 4 && value.substring(value.length, value.length - 4) === ".eth"){
+                    transactionData = await parseEtherscanData(value);
+                    //console.log(transactionData);
+                    
+                    updateData(transactionData);
+                }
+            }*/
         }
+        
+
     }
+    
 
     React.useEffect(() => {
         const inputRefCurrent = inputRef.current;
@@ -231,7 +242,8 @@ const CalendarBox = ({transactionData}) => {
             <Calendar id="CalendarComponent"
             margin={margin}
             width={stateWidth}
-            height={1000}
+            height={stateHeight}
+            align="top"
             from={transactionData[0].day}
             to={transactionData[transactionData.length - 1].day}
             data={transactionData}
